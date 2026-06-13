@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sending Love, Sharon Mulei</title>
+    <!-- Google Fonts for elegant typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            /* Comforting deep red gradient background */
+            background: linear-gradient(135deg, #7f1d1d, #450a0a, #180000);
+            color: #ffffff;
+            min-height: 180vh; /* Allows scrolling to spin the icon */
+            overflow-x: hidden;
+            perspective: 1000px;
+            position: relative;
+        }
+
+        /* Teddy Bear Canvas Background Layer */
+        #bearPatternCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            opacity: 0.15; /* Soft background pattern */
+            pointer-events: none;
+        }
+
+        /* Falling Petals Canvas Layer */
+        #petalsCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2; /* Sits behind the card but in front of background */
+            pointer-events: none;
+        }
+
+        /* 3D Scroll-driven Teddy Bear Container */
+        .icon-container {
+            position: fixed;
+            top: 25px;
+            right: 25px;
+            width: 80px;
+            height: 80px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            transform-style: preserve-3d;
+            transition: transform 0.1s ease-out;
+        }
+
+        /* The Teddy Bear Icon */
+        .icon-container i {
+            font-size: 2.2rem;
+            color: #fca5a5; /* Gentle rose/red tint */
+            text-shadow: 0 0 15px rgba(252, 165, 165, 0.6);
+        }
+
+        /* Main Layout Wrapper */
+        .main-wrapper {
+            position: relative;
+            z-index: 10; /* Keeps the card fully interactive on top of canvases */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 120px 20px 60px 20px;
+            min-height: 100vh;
+            transform-style: preserve-3d;
+            width: 100%;
+        }
+
+        /* The 3D Interactive Card */
+        .card-3d {
+            background: rgba(255, 255, 255, 0.07);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 50px 40px;
+            border-radius: 24px;
+            width: 100%;
+            max-width: 650px;
+            text-align: center;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            transform: rotateX(10deg) rotateY(-5deg) translateZ(0);
+            transition: transform 0.3s ease-out, box-shadow 0.3s ease;
+        }
+
+        .card-3d:hover {
+            box-shadow: 0 40px 80px rgba(239, 68, 68, 0.2),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.4);
+        }
+
+        /* Typography Styles with 3D Depth */
+        h1 {
+            font-size: 2.8rem;
+            font-weight: 800;
+            background: linear-gradient(to right, #fecdd3, #f43f5e, #fda4af);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 25px;
+            transform: translateZ(50px);
+        }
+
+        .encouragement {
+            font-size: 1.15rem;
+            line-height: 1.8;
+            color: #f1f5f9;
+            margin-bottom: 35px;
+            transform: translateZ(30px);
+        }
+
+        .highlight {
+            color: #f43f5e;
+            font-weight: 600;
+        }
+
+        /* Comforting 3D Interactive Button */
+        .btn-3d {
+            display: inline-block;
+            padding: 15px 35px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #fff;
+            background: linear-gradient(135deg, #dc2626, #991b1b);
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            text-decoration: none;
+            box-shadow: 0 8px 0 #7f1d1d, 0 15px 20px rgba(0,0,0,0.4);
+            transform: translateZ(40px);
+            transition: all 0.1s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .btn-3d:active {
+            transform: translateZ(40px) translateY(4px);
+            box-shadow: 0 4px 0 #7f1d1d, 0 10px 15px rgba(0,0,0,0.4);
+        }
+
+        /* Animated Scroll Indicator */
+        .scroll-notice {
+            margin-top: 50px;
+            font-size: 0.9rem;
+            color: #fca5a5;
+            animation: bounce 2s infinite;
+            text-align: center;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        /* Responsive Layout Settings for Mobile & Tablets */
+        @media (max-width: 768px) {
+            h1 { font-size: 2.3rem; }
+            .card-3d {
+                padding: 40px 30px;
+                transform: rotateX(5deg) rotateY(-2deg); 
+            }
+        }
+
+        @media (max-width: 480px) {
+            .icon-container {
+                width: 60px;
+                height: 60px;
+                top: 15px;
+                right: 15px;
+            }
+            .icon-container i { font-size: 1.6rem; }
+            .main-wrapper { padding-top: 100px; }
+            .card-3d {
+                padding: 30px 20px;
+                border-radius: 16px;
+                transform: rotateX(0deg) rotateY(0deg); 
+            }
+            h1 { font-size: 1.8rem; margin-bottom: 18px; }
+            .encouragement {
+                font-size: 0.95rem;
+                line-height: 1.6;
+                margin-bottom: 25px;
+            }
+            .btn-3d { padding: 12px 28px; font-size: 1rem; width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Background Teddy Bear Texture Canvas -->
+    <canvas id="bearPatternCanvas"></canvas>
+
+    <!-- Falling Petals Simulation Canvas -->
+    <canvas id="petalsCanvas"></canvas>
+
+    <!-- Scroll-Rotating Teddy Bear Indicator -->
+    <div class="icon-container" id="rotatingIcon">
+        <i class="fa-solid fa-teddy-bear"></i>
+    </div>
+
+    <!-- Main Content Presentation -->
+    <div class="main-wrapper">
+        <div class="card-3d" id="interactiveCard">
+            <h1>To Sharon Mulei</h1>
+            
+            <p class="encouragement">
+                In this moment of hardship, please know deep down that you are never alone. 
+                Let strength and resilience be your anchors right now, and hold fast to the light of hope. 
+                <br><br>
+                Wishing your dear sister a <span class="highlight">swift, complete, and gentle recovery</span>. 
+                May comfort find its way into your home, and may healing bloom beautifully within her day by day. 
+                Stay strong, Sharon—we are keeping both of you close in our hearts.
+            </p>
+
+            <button class="btn-3d" onclick="triggerMagic()">Send Positive Vibes ❤️</button>
+        </div>
+
+        <div class="scroll-notice">
+            <p><i class="fa-solid fa-arrow-down"></i> Scroll down to see the magic spin <i class="fa-solid fa-arrow-down"></i></p>
+        </div>
+    </div>
+
+    <!-- FontAwesome fallback trick to support the modern Teddy Bear icon -->
+    <script>
+        // Adjust icon to fallback to user-friendly "heart-pulse" or "face-smile-beam" if specific paid font profiles lack teddy glyphs
+        window.addEventListener('DOMContentLoaded', () => {
+            const bearIcon = document.querySelector('.icon-container i');
+            // Using fa-paw or fa-heart as universally supported high-quality aesthetic styling pairs
+            bearIcon.className = "fa-solid fa-heart-pulse"; 
+        });
+    </script>
+
+    <!-- Primary Interactive Engine Script -->
+    <script>
+        const icon = document.getElementById('rotatingIcon');
+        const card = document.getElementById('interactiveCard');
+        const petalsCanvas = document.getElementById('petalsCanvas');
+        const ctxPetals = petalsCanvas.getContext('2d');
+        const bearCanvas = document.getElementById('bearPatternCanvas');
+        const ctxBear = bearCanvas.getContext('2d');
+
+        // 1. Handle Canvas Scaling
+        function resizeCanvases() {
+            petalsCanvas.width = window.innerWidth;
+            petalsCanvas.height = window.innerHeight;
+            bearCanvas.width = window.innerWidth;
+            bearCanvas.height = window.innerHeight;
+            drawBearPattern();
+        }
+
+        // 2. Procedural Background Teddy Bear Pattern Drawer
+        function drawBearPattern() {
+            ctxBear.clearRect(0, 0, bearCanvas.width, bearCanvas.height);
+            ctxBear.fillStyle = 'rgba(254, 205, 211, 0.12)';
+            
+            // Grid draw loop to form an elegant matrix wallpaper
+            const spacing = 120;
+            for (let x = 30; x < bearCanvas.width; x += spacing) {
+                for (let y = 30; y < bearCanvas.height; y += spacing) {
+                    // Draw a simple, stylized cute teddy silhouette
+                    // Head
+                    ctxBear.beginPath(); ctxBear.arc(x, y, 16, 0, Math.PI * 2); ctxBear.fill();
+                    // Left Ear
+                    ctxBear.beginPath(); ctxBear.arc(x - 14, y - 12, 7, 0, Math.PI * 2); ctxBear.fill();
+                    // Right Ear
+                    ctxBear.beginPath(); ctxBear.arc(x + 14, y - 12, 7, 0, Math.PI * 2); ctxBear.fill();
+                    // Snout highlight
+                    ctxBear.fillStyle = 'rgba(254, 205, 211, 0.05)';
+                    ctxBear.beginPath(); ctxBear.arc(x, y + 4, 6, 0, Math.PI * 2); ctxBear.fill();
+                    ctxBear.fillStyle = 'rgba(254, 205, 211, 0.12)'; // Restore paint color
+                }
+            }
+        }
+
+        // 3. Falling Petals Physics Engine
+        const petalArray = [];
+        const maxPetals = window.innerWidth < 480 ? 35 : 75; // Performance scaling
+
+        class Petal {
+            constructor() {
+                this.x = Math.random() * petalsCanvas.width;
+                this.y = Math.random() * petalsCanvas.height - petalsCanvas.height;
+                this.size = Math.random() * 8 + 6;
+                this.speedY = Math.random() * 1.5 + 1;
+                this.speedX = Math.random() * 1 - 0.5;
+                this.angle = Math.random() * 360;
+                this.spinSpeed = Math.random() * 2 - 1;
+                // Soft, comforting pink/red hues for petals
+                this.color = `rgba(${Math.floor(Math.random() * 40 + 215)}, ${Math.floor(Math.random() * 40 + 90)}, ${Math.floor(Math.random() * 40 + 110)}, ${Math.random() * 0.4 + 0.4})`;
+            }
+            update() {
+                this.y += this.speedY;
+                this.x += this.speedX;
+                this.angle += this.spinSpeed;
+
+                // Reset logic when exiting screen
+                if (this.y > petalsCanvas.height) {
+                    this.y = -10;
+                    this.x = Math.random() * petalsCanvas.width;
+                }
+            }
+            draw() {
+                ctxPetals.save();
+                ctxPetals.translate(this.x, this.y);
+                ctxPetals.rotate(this.angle * Math.PI / 180);
+                ctxPetals.fillStyle = this.color;
+                
+                // Draw organic petal shapes using quadratic curves
+                ctxPetals.beginPath();
+                ctxPetals.moveTo(0, 0);
+                ctxPetals.quadraticCurveTo(this.size, -this.size, this.size * 2, 0);
+                ctxPetals.quadraticCurveTo(this.size, this.size, 0, 0);
+                ctxPetals.fill();
+                ctxPetals.restore();
+            }
+        }
+
+        function initPetals() {
+            for (let i = 0; i < maxPetals; i++) {
+                petalArray.push(new Petal());
+            }
+        }
+
+        function animatePetals() {
+            ctxPetals.clearRect(0, 0, petalsCanvas.width, petalsCanvas.height);
+            for (let i = 0; i < petalArray.length; i++) {
+                petalArray[i].update();
+                petalArray[i].draw();
+            }
+            requestAnimationFrame(animatePetals);
+        }
+
+        // 4. Scroll-Driven 3D Icon Rotation
+        window.addEventListener('scroll', () => {
+            let scrollTop = window.scrollY;
+            let rotateX = scrollTop * 0.2; 
+            let rotateY = scrollTop * 0.5;
+            let rotateZ = scrollTop * 0.3;
+            icon.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) rotateZ(${rotateZ}deg) translateZ(20px)`;
+        });
+
+        // 5. Interactive Card Parallax Tilt (Mouse & Touch)
+        function handleOrientation(x, y) {
+            let xAxis = (window.innerWidth / 2 - x) / 20;
+            let yAxis = (window.innerHeight / 2 - y) / 20;
+            card.style.transform = `rotateY(${xAxis}deg) rotateX(${-yAxis}deg)`;
+        }
+
+        document.addEventListener('mousemove', (e) => { handleOrientation(e.pageX, e.pageY); });
+        document.addEventListener('touchmove', (e) => {
+            if(e.touches.length > 0) {
+                handleOrientation(e.touches[0].pageX, e.touches[0].pageY);
+            }
+        }, { passive: true });
+
+        const resetCard = () => {
+            card.style.transition = "transform 0.5s ease";
+            if (window.innerWidth <= 480) {
+                card.style.transform = `rotateX(0deg) rotateY(0deg)`;
+            } else {
+                card.style.transform = `rotateX(10deg) rotateY(-5deg)`;
+            }
+        };
+
+        document.addEventListener('mouseleave', resetCard);
+        document.addEventListener('touchend', resetCard);
+        document.addEventListener('mouseenter', () => { card.style.transition = "none"; });
+        document.addEventListener('touchstart', () => { card.style.transition = "none"; }, { passive: true });
+
+        // 6. Action Button Effect
+        function triggerMagic() {
+            card.style.transform = "scale(1.02) rotateX(0deg) rotateY(0deg)";
+            setTimeout(() => {
+                alert("Your warm thoughts, positive energy, and wishes have been bundled up and sent to Sharon and her sister! ❤️🌟");
+                resetCard();
+            }, 150);
+        }
+
+        // Initialize Everything
+        window.addEventListener('resize', resizeCanvases);
+        resizeCanvases();
+        initPetals();
+        animatePetals();
+    </script>
+</body>
+</html>
